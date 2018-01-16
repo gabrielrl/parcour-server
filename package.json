@@ -1,0 +1,45 @@
+{
+  "name": "parcour-server",
+  "version": "0.1.0",
+  "description": "Server back-end API for the Parcour game",
+  "main": "build/server.js",
+  "scripts": {
+    "start": "node build/index.js",
+    "test": "mocha --reporter spec --compilers ts:ts-node/register \"test/**/*.test.ts\""
+  },
+  "keywords": [
+    "parcour",
+    "server"
+  ],
+  "author": "Gabriel Roy-Lortie",
+  "license": "GPLv3",
+  "devDependencies": {
+    "@types/body-parser": "^1.16.4",
+    "@types/chai": "^3.5.2",
+    "@types/chai-http": "0.0.29",
+    "@types/cors": "^2.8.1",
+    "@types/debug": "0.0.29",
+    "@types/express": "^4.0.36",
+    "@types/mocha": "^2.2.41",
+    "@types/morgan": "^1.7.32",
+    "@types/node": "^8.0.14",
+    "@types/pg": "^6.1.42",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-typescript": "^3.2.1",
+    "mocha": "^3.1.2",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
+    "debug": "^2.6.8",
+    "express": "^4.15.3",
+    "guid": "0.0.12",
+    "morgan": "^1.8.2",
+    "pg": "^7.0.1"
+  }
+}
