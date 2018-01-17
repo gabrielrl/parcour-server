@@ -12,7 +12,7 @@
     "server"
   ],
   "author": "Gabriel Roy-Lortie",
-  "license": "GPLv3",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
     "@types/chai": "^3.5.2",
@@ -41,5 +41,6 @@
     "guid": "0.0.12",
     "morgan": "^1.8.2",
     "pg": "^7.0.1"
-  }
+  },
+  "repository": "https://github.com/gabrielrl/parcour-server.git"
 }
