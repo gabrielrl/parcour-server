@@ -1,6 +1,8 @@
 # parcour-server
 
-Parcour Node.js back-end API
+Node.js back-end API for the Parcour project.
+
+Not sure yet what it is.
 
 ## Version
 
