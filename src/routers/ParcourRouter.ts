@@ -16,7 +16,7 @@ export class ParcourRouter {
   constructor(repository: ParcourRepository) {
     this.router = Router();
     this.repository = repository;
-    this.init();
+    this._init();
   }
 
   /**
@@ -140,7 +140,7 @@ export class ParcourRouter {
    * Take each handler, and attach to one of the Express.Router's
    * endpoints.
    */
-  public init() {
+  private _init() {
     this.router.get('/', (req, res, next) => this.getAll(req, res, next));
     this.router.get('/:id', (req, res, next) => this.getById(req, res, next));
     this.router.post('/', (req, res, next) => this.create(req, res, next));
@@ -159,6 +159,5 @@ export class ParcourRouter {
 
 // Create the ParcourRouter, and export its configured Express.Router
 const parcourRoutes = new ParcourRouter(new ParcourRepository());
-parcourRoutes.init();
 
 export default parcourRoutes.router;
