@@ -3,21 +3,8 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
-import * as jwt from 'express-jwt';
-import * as jwks from 'jwks-rsa';
 import ParcourRouter from './routers/ParcourRouter';
-
-var auth = jwt({
-  secret: jwks.expressJwtSecret({
-      cache: true,
-      rateLimit: true,
-      jwksRequestsPerMinute: 5,
-      jwksUri: "https://parcour.auth0.com/.well-known/jwks.json"
-  }),
-  audience: 'http://localhost:8080',
-  issuer: "https://parcour.auth0.com/",
-  algorithms: ['RS256']
-});
+import UserRouter from './routers/UserRouter';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -33,7 +20,17 @@ class App {
     
     this.middleware();
     this.routes();
-        
+    
+    this.express.use(function finalErrorHandler(err, req, res, next) {
+      if (err) {
+        res.status(err.status || 500).json({
+          status: 'error',
+          message: err.message,
+          stack: err.stack // !!
+        });
+      }
+
+    });
   }
 
   // Configure Express middleware.
@@ -57,14 +54,7 @@ class App {
     });
     this.express.use('/', router);
     this.express.use('/api/v1/parcours', ParcourRouter);
-
-    this.express.use('/api/v1/users/whoami', auth, function(req, res, next) {
-      res.json({
-        status: 'success',
-        message: 'here\'s who',
-        data: req.user
-      });
-    });
+    this.express.use('/api/v1/users', UserRouter);
   }
 }
 

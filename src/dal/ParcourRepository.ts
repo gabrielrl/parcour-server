@@ -1,4 +1,5 @@
-import {Pool, Client, QueryResult} from 'pg';
+import { QueryResult } from 'pg';
+import pool from './Pool';
 
 import Parcour from '../model/Parcour';
 
@@ -10,25 +11,15 @@ const data = [
 
 export default class ParcourRepository {
 
-  private _pool: Pool;
-
-  constructor() {
-    this._pool = new Pool({
-      user: 'parcour-app',
-      host: 'localhost',
-      database: 'parcour',
-      password: 'parcour',
-      port: 5432,
-    });
-
-    // EVENTUALLY... this._pool.end()
-  }
+  constructor() { }
 
   public getAll(): Promise<Parcour[]> {
     return new Promise((resolve, reject) => {
-      this._pool.query(
-        'SELECT id, name, created_on "createdOn", updated_on "updatedOn" FROM parcours ' +
-        'ORDER BY updated_on DESC')
+      pool.query(
+        'SELECT p.id, p.name, p.created_on "createdOn", p.updated_on "updatedOn", ' + 
+        'u.id "userId", u.nickname "userNickname"' +
+        'FROM parcours p LEFT JOIN users u ON p.user_id = u.id ' +
+        'ORDER BY p.updated_on DESC')
       .then(result => {
         resolve(result.rows);
       })
@@ -40,7 +31,7 @@ export default class ParcourRepository {
   public getById(id: string): Promise<Parcour> {
 
     return new Promise((resolve, reject) => {
-      this._pool.query('SELECT data FROM parcours WHERE id = $1', [id])
+      pool.query('SELECT data FROM parcours WHERE id = $1', [id])
         .then(result => {
           if (result.rowCount === 0) reject(new Error('Not found'));
           else resolve(result.rows[0].data);
@@ -53,10 +44,10 @@ export default class ParcourRepository {
   public add(parcour: Parcour): Promise<QueryResult> {
     let data = JSON.stringify(parcour);
     return new Promise((resolve, reject) => {
-      this._pool.query(
-        'INSERT INTO parcours(id, name, data, created_on, updated_on) ' +
-        'VALUES ($1, $2, $3, $4, $4)',
-        [parcour.id, parcour.name, data, new Date()]
+      pool.query(
+        'INSERT INTO parcours(id, name, data, created_on, updated_on, user_id) ' +
+        'VALUES ($1, $2, $3, $4, $4, $5)',
+        [parcour.id, parcour.name, data, new Date(), parcour.userId]
       )
       .then(result => resolve(result))
       .catch(err => reject(err));
@@ -65,7 +56,7 @@ export default class ParcourRepository {
 
   public update(parcour: Parcour): Promise<QueryResult> {
     let data = JSON.stringify(parcour);
-    return this._pool.query(
+    return pool.query(
       'UPDATE parcours ' +
       'SET name=$2, data=$3, updated_on=$4' +
       'WHERE id = $1',
@@ -75,7 +66,7 @@ export default class ParcourRepository {
 
   public removeById(id: string) {
     return new Promise((resolve, reject) => {
-      this._pool.query(
+      pool.query(
         'DELETE FROM parcours WHERE id = $1', [id]
       )
       .then(result => {
