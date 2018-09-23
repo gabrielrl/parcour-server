@@ -28,7 +28,7 @@ export class UserRouter {
     // this.router.put('/:id', (req, res, next) => this.update(req, res, next));
     // this.router.delete('/:id', (req, res, next) => this.delete(req, res, next));
 
-    this.router.get('/whoami', Auth.auth, /*Auth.checkJwt, Auth.getParcourUser,*/ (req, res, next) => this.whoAmI(req, res, next));
+    this.router.get('/whoami', Auth.auth, (req, res, next) => this.whoAmI(req, res, next));
   }
 
   public getAll(req: Request, res: Response, next: NextFunction) {
