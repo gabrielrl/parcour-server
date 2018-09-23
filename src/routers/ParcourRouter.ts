@@ -1,7 +1,6 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { auth } from '../Auth';
 
-//import * as Guid from 'guid';
 const Guid = require('guid');
 
 import ParcourRepository from '../dal/ParcourRepository';
@@ -25,7 +24,6 @@ export class ParcourRouter {
    */
   public getAll(req: Request, res: Response, next: NextFunction) {
     this.repository.getAll().then(parcours => res.send(parcours));
-    // res.send(this.repository.getAll());
   }
 
   /**

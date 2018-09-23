@@ -65,7 +65,4 @@ export default class UserRepository {
       return user;
     });
   }
-
-
-
 }
