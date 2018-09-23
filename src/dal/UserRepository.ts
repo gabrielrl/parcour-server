@@ -53,9 +53,7 @@ export default class UserRepository {
             resolve(result.rows[0]);
           }
         })
-        .catch(err => {
-          reject(err);
-        });
+        .catch(err => reject(err));
     });
   }
 
