@@ -3,25 +3,27 @@ import * as jwt from 'express-jwt';
 import * as jwks from 'jwks-rsa';
 import UserRepository from './dal/UserRepository';
 
+const userRepository = new UserRepository();
+
 const checkJwt = jwt({
   secret: jwks.expressJwtSecret({
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: "https://parcour.auth0.com/.well-known/jwks.json"
+      jwksUri: 'https://parcour.auth0.com/.well-known/jwks.json'
   }),
   audience: 'http://localhost:8080',
-  issuer: "https://parcour.auth0.com/",
-  algorithms: ['RS256']
+  issuer: 'https://parcour.auth0.com/',
+  algorithms: [ 'RS256' ]
 });
 
 /**
  * Checks for and validates a JSON Web Token to authenticate the request. If no auth info is found, the request is
- * responded with an Unauthorized response, else the request object is augmented with a `User` instance on the `user`
+ * responded with Unauthorized, else the request object is augmented with a `User` instance on the `user`
  * property before being handled to the next function.
  * @param req Request
  * @param res Response
- * @param next Next handler
+ * @param next Next function
  */
 const auth = function(req: Request, res: Response, next: NextFunction) {
 
@@ -40,18 +42,4 @@ const auth = function(req: Request, res: Response, next: NextFunction) {
 
 };
 
-const userRepository = new UserRepository();
-
-const getParcourUser = function(req: Request, res: Response, next: NextFunction) {
-  if (req.user) {
-    userRepository
-      .getOrCreateFromAuthUser(req.user)
-      .then(parcourUser => {
-        req['parcourUser'] = parcourUser;
-        next();
-      })
-      .catch(err => next(err));
-  }
-};
-
-export { checkJwt, auth, getParcourUser };
+export { auth };
