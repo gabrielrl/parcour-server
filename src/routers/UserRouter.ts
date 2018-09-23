@@ -22,7 +22,7 @@ export class UserRouter {
    * endpoints.
    */
   private _init() {
-    this.router.get('/', (req, res, next) => this.getAll(req, res, next));
+    this.router.get('/', Auth.auth, (req, res, next) => this.getAll(req, res, next));
     // this.router.get('/:id', (req, res, next) => this.getById(req, res, next));
     // this.router.post('/', (req, res, next) => this.create(req, res, next));
     // this.router.put('/:id', (req, res, next) => this.update(req, res, next));
