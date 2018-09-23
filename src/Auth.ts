@@ -15,6 +15,14 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
+/**
+ * Checks for and validates a JSON Web Token to authenticate the request. If no auth info is found, the request is
+ * responded with an Unauthorized response, else the request object is augmented with a `User` instance on the `user`
+ * property before being handled to the next function.
+ * @param req Request
+ * @param res Response
+ * @param next Next handler
+ */
 const auth = function(req: Request, res: Response, next: NextFunction) {
 
   checkJwt(req, res, function (err?) {
