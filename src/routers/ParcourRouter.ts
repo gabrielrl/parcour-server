@@ -1,6 +1,6 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
+import { auth } from '../Auth';
 
-//import * as Guid from 'guid';
 const Guid = require('guid');
 
 import ParcourRepository from '../dal/ParcourRepository';
@@ -16,7 +16,7 @@ export class ParcourRouter {
   constructor(repository: ParcourRepository) {
     this.router = Router();
     this.repository = repository;
-    this.init();
+    this._init();
   }
 
   /**
@@ -24,7 +24,6 @@ export class ParcourRouter {
    */
   public getAll(req: Request, res: Response, next: NextFunction) {
     this.repository.getAll().then(parcours => res.send(parcours));
-    // res.send(this.repository.getAll());
   }
 
   /**
@@ -55,7 +54,6 @@ export class ParcourRouter {
 
     let parcour = req.body;
 
-
     if (!parcour) {
       return ParcourRouter.sendBadRequest(res,
         new Error('Missing payload.'));
@@ -69,6 +67,9 @@ export class ParcourRouter {
     if (!parcour.id) {
       parcour.id = Guid.raw();
     }
+
+    // Link parcour with current user.
+    parcour.userId = req.user.id;
 
     this.repository.add(parcour)
       .then(result => {
@@ -140,12 +141,12 @@ export class ParcourRouter {
    * Take each handler, and attach to one of the Express.Router's
    * endpoints.
    */
-  public init() {
+  private _init() {
     this.router.get('/', (req, res, next) => this.getAll(req, res, next));
     this.router.get('/:id', (req, res, next) => this.getById(req, res, next));
-    this.router.post('/', (req, res, next) => this.create(req, res, next));
-    this.router.put('/:id', (req, res, next) => this.update(req, res, next));
-    this.router.delete('/:id', (req, res, next) => this.delete(req, res, next));
+    this.router.post('/', auth, (req, res, next) => this.create(req, res, next));
+    this.router.put('/:id', auth, (req, res, next) => this.update(req, res, next));
+    this.router.delete('/:id', auth, (req, res, next) => this.delete(req, res, next));
   }
 
   private static sendBadRequest(res: Response, error: Error) {
@@ -159,6 +160,5 @@ export class ParcourRouter {
 
 // Create the ParcourRouter, and export its configured Express.Router
 const parcourRoutes = new ParcourRouter(new ParcourRepository());
-parcourRoutes.init();
 
 export default parcourRoutes.router;

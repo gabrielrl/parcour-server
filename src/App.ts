@@ -3,8 +3,8 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
-
 import ParcourRouter from './routers/ParcourRouter';
+import UserRouter from './routers/UserRouter';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -20,7 +20,17 @@ class App {
     
     this.middleware();
     this.routes();
-        
+    
+    this.express.use(function finalErrorHandler(err, req, res, next) {
+      if (err) {
+        res.status(err.status || 500).json({
+          status: 'error',
+          message: err.message,
+          stack: err.stack // !!
+        });
+      }
+
+    });
   }
 
   // Configure Express middleware.
@@ -44,6 +54,7 @@ class App {
     });
     this.express.use('/', router);
     this.express.use('/api/v1/parcours', ParcourRouter);
+    this.express.use('/api/v1/users', UserRouter);
   }
 }
 
