@@ -3,12 +3,6 @@ import pool from './Pool';
 
 import Parcour from '../model/Parcour';
 
-const data = [
-  { id: "1", name: "first", data: "{ first }" },
-  { id: "2", name: "second", data: "{ second }" }
-];
-
-
 export default class ParcourRepository {
 
   constructor() { }
