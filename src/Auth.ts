@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'express-jwt';
 import * as jwks from 'jwks-rsa';
 import UserRepository from './dal/UserRepository';
+import User from './model/User';
 
 const userRepository = new UserRepository();
 
@@ -17,6 +18,13 @@ const checkJwt = jwt({
   algorithms: [ 'RS256' ]
 });
 
+interface AuthUser { }
+
+interface AuthenticatedRequest extends Request {
+  user: User;
+  authUser: any
+}
+
 /**
  * Checks for and validates a JSON Web Token to authenticate the request. If no auth info is found, the request is
  * responded with Unauthorized, else the request object is augmented with a `User` instance on the `user`
@@ -28,13 +36,14 @@ const checkJwt = jwt({
 const auth = function(req: Request, res: Response, next: NextFunction) {
 
   checkJwt(req, res, function (err?) {
+
     if (err) return next(err);
 
     userRepository
-      .getOrCreateFromAuthUser(req.user)
+      .getOrCreateFromAuthUser((<any>req).user)
       .then(parcourUser => {
-        req['authUser'] = req.user;
-        req.user = parcourUser;
+        req['authUser'] = (<any>req).user;
+        (<AuthenticatedRequest>req).user = parcourUser;
         next();
       })
       .catch(err => next(err));
@@ -42,4 +51,4 @@ const auth = function(req: Request, res: Response, next: NextFunction) {
 
 };
 
-export { auth };
+export { auth, AuthenticatedRequest };

@@ -1,9 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { auth } from '../Auth';
+import { auth, AuthenticatedRequest } from '../Auth';
 
 const Guid = require('guid');
 
 import ParcourRepository from '../dal/ParcourRepository';
+import RunRouter from './RunRouter';
 
 export class ParcourRouter {
   router: Router
@@ -50,7 +51,7 @@ export class ParcourRouter {
    * @param res 
    * @param next 
    */
-  public create(req: Request, res: Response, next: NextFunction) {
+  public create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
 
     let parcour = req.body;
 
@@ -144,9 +145,11 @@ export class ParcourRouter {
   private _init() {
     this.router.get('/', (req, res, next) => this.getAll(req, res, next));
     this.router.get('/:id', (req, res, next) => this.getById(req, res, next));
-    this.router.post('/', auth, (req, res, next) => this.create(req, res, next));
-    this.router.put('/:id', auth, (req, res, next) => this.update(req, res, next));
-    this.router.delete('/:id', auth, (req, res, next) => this.delete(req, res, next));
+    this.router.post('/', auth, (req, res, next) => this.create(<AuthenticatedRequest>req, res, next));
+    this.router.put('/:id', auth, (req, res, next) => this.update(<AuthenticatedRequest>req, res, next));
+    this.router.delete('/:id', auth, (req, res, next) => this.delete(<AuthenticatedRequest>req, res, next));
+
+    this.router.use('/:parcourId/runs', RunRouter);
   }
 
   private static sendBadRequest(res: Response, error: Error) {
