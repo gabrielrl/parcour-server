@@ -58,16 +58,19 @@ CREATE TABLE runs
 (
   id uuid NOT NULL,
   parcour_id uuid NOT NULL,
-  user_id uuid NOT NULL,
+  user_id uuid,
   created_on timestamp without time zone,
   updated_on timestamp without time zone,
   started_on timestamp without time zone,
   ended_on timestamp without time zone,
   outcome integer,
   CONSTRAINT pk_runs PRIMARY KEY (id ),
-  CONSTRAINT fk_parcour_user FOREIGN KEY (user_id)
+  CONSTRAINT fk_run_parcour FOREIGN KEY (parcour_id)
+      REFERENCES parcours (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_run_user FOREIGN KEY (user_id)
       REFERENCES users (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
