@@ -26,9 +26,9 @@ interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Checks for and validates a JSON Web Token to authenticate the request. If no auth info is found, the request is
- * responded with Unauthorized, else the request object is augmented with a `User` instance on the `user`
- * property before being handled to the next function.
+ * Middleware that checks for and validates a JSON Web Token to authenticate the request. If no auth info is
+ * found, the request is responded with Unauthorized, else the request object is augmented with a `User` instance
+ * on the `user` property before being handled to the next function.
  * @param req Request
  * @param res Response
  * @param next Next function
@@ -51,4 +51,35 @@ const auth = function(req: Request, res: Response, next: NextFunction) {
 
 };
 
-export { auth, AuthenticatedRequest };
+/**
+ * Middleware that checks for and validates a JSON Web Token to authenticate the request. If proper auth info
+ * is found, the request object is augmented with a `User` instance on the `user` property before being handled
+ * to the next function. If no auth info is found, the `user` propery is explicitely set to `null` and the next
+ * handler is called.
+ * @param req Request
+ * @param res Response
+ * @param next Next function
+ */
+
+const checkAuth = function(req: Request, res: Response, next: NextFunction) {
+  checkJwt(req, res, function (err?) {
+
+    if (err) {
+      // TODO what kind of error are we facing?
+      console.error('auth error=', err);
+      (<AuthenticatedRequest>req).user = null;
+      next();
+    }
+
+    userRepository
+      .getOrCreateFromAuthUser((<any>req).user)
+      .then(parcourUser => {
+        req['authUser'] = (<any>req).user;
+        (<AuthenticatedRequest>req).user = parcourUser;
+        next();
+      })
+      .catch(err => next(err));
+  })
+}
+
+export { auth, checkAuth, AuthenticatedRequest };
