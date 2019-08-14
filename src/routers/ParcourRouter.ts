@@ -4,7 +4,8 @@ import { auth, AuthenticatedRequest } from '../Auth';
 const Guid = require('guid');
 
 import ParcourRepository from '../dal/ParcourRepository';
-import RunRouter from './RunRouter';
+import RunRoutes from './RunRoutes';
+import RunRepository from '../dal/RunRepository';
 
 export class ParcourRouter {
   router: Router
@@ -149,7 +150,8 @@ export class ParcourRouter {
     this.router.put('/:id', auth, (req, res, next) => this.update(<AuthenticatedRequest>req, res, next));
     this.router.delete('/:id', auth, (req, res, next) => this.delete(<AuthenticatedRequest>req, res, next));
 
-    this.router.use('/:parcourId/runs', RunRouter);
+    let runRoutes = new RunRoutes();
+    this.router.use('/:parcourId/runs', runRoutes.router);
   }
 
   private static sendBadRequest(res: Response, error: Error) {
