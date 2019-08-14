@@ -59,15 +59,23 @@ export default class RunRepository {
     });
   }
 
+  /**
+   * Updates a run object in the database. Updates each run only once.
+   * Fails (throws) if 0 zero rows are affected. It could mean one of the IDs is off or the run had already
+   * been updated.
+   * @param run A run object to update
+   */
   public update(run: Run): Promise<QueryResult> {
-    // let data = JSON.stringify(parcour);
     return pool.query(
-      'todo'
-      // 'UPDATE parcours ' +
-      // 'SET name=$2, data=$3, updated_on=$4' +
-      // 'WHERE id = $1',
-      // [parcour.id, parcour.name, data, new Date()]
-    );
+      'UPDATE runs ' +
+      'SET started_on=$2, ended_on=$3, outcome=$4 updated_on=$5' +
+      'WHERE id = $1 AND outcome = 0 AND ' +
+      'user_id = $6 AND parcour_id = $7',
+      [ run.id, run.startedOn, run.endedOn, run.outcome, new Date(), run.userId, run.parcourId ]
+    ).then(result => {
+      if (result.rowCount === 0) throw new Error('0 run affected. Maybe your target was already updated once or one of the parameters is off.');
+      return result;
+    });
   }
 
   public removeById(id: string) {
