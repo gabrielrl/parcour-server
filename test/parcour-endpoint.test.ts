@@ -1,4 +1,4 @@
-import * as mocha from 'mocha';
+import 'mocha';
 import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
