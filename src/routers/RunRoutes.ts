@@ -30,7 +30,7 @@ export default class RunRoutes {
     this._router.get('/', (req, res, next) => this.getByParcourId(req, res, next));
     // this.router.get('/:id', (req, res, next) => this.getById(req, res, next));
     this._router.post('/', checkAuth, (req, res, next) => this.create(<AuthenticatedRequest>req, res, next));
-    this._router.put('/:id', auth, (req, res, next) => this.update(<AuthenticatedRequest>req, res, next));
+    this._router.put('/:id', checkAuth, (req, res, next) => this.update(<AuthenticatedRequest>req, res, next));
     // this.router.delete('/:id', (req, res, next) => this.delete(req, res, next));
   }
 
