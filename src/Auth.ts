@@ -68,7 +68,7 @@ const checkAuth = function(req: Request, res: Response, next: NextFunction) {
       // TODO what kind of error are we facing?
       console.error('auth error=', err);
       (<AuthenticatedRequest>req).user = null;
-      next();
+      return next();
     }
 
     userRepository
