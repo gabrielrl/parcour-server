@@ -2,7 +2,7 @@ import { QueryResult } from 'pg';
 import pool from './Pool';
 
 import Parcour from '../model/Parcour';
-
+import ParcourError from '../errors/ParcourError';
 export default class ParcourRepository {
 
   constructor() { }
@@ -22,13 +22,34 @@ export default class ParcourRepository {
 
   }
 
+  public doesExist(parcourId: string): Promise<boolean> {
+
+    return pool.query(
+      'SELECT count(*) "c" FROM parcours WHERE id = $1',
+      [ parcourId ]      
+    ).then(result => {
+      return result.rowCount !== 0 && parseInt(result.rows[0].c) !== 0;
+    });
+  }
+
+  /**
+   * Gets a Promise for a parcour object from the database by its id.  
+   * @param id
+   */
+
   public getById(id: string): Promise<Parcour> {
 
     return new Promise((resolve, reject) => {
       pool.query('SELECT data FROM parcours WHERE id = $1', [id])
         .then(result => {
-          if (result.rowCount === 0) reject(new Error('Not found'));
-          else resolve(result.rows[0].data);
+          if (result.rowCount === 0) {
+            reject(new ParcourError(
+              `Parcour having ID "${ id } could not be found`,
+              404
+            ));
+          } else {
+            resolve(result.rows[0].data);
+          }
         })
         .catch(err => reject(err));
     });
