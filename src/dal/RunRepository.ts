@@ -66,12 +66,21 @@ export default class RunRepository {
    * @param run A run object to update
    */
   public update(run: Run): Promise<QueryResult> {
-    return pool.query(
-      'UPDATE runs ' +
-      'SET started_on=$2, ended_on=$3, outcome=$4 updated_on=$5' +
-      'WHERE id = $1 AND outcome = 0 AND ' +
-      'user_id = $6 AND parcour_id = $7',
-      [ run.id, run.startedOn, run.endedOn, run.outcome, new Date(), run.userId, run.parcourId ]
+
+    return (
+      run.userId == null
+        ? pool.query(
+          'UPDATE runs ' +
+          'SET started_on=$2, ended_on=$3, outcome=$4, updated_on=$5' +
+          `WHERE id=$1 AND outcome=0 AND user_id IS NULL AND parcour_id=$6`,
+          [ run.id, new Date(run.startedOn), new Date(run.endedOn), run.outcome, new Date(), run.parcourId ]
+        )
+        : pool.query(
+          'UPDATE runs ' +
+          'SET started_on=$2, ended_on=$3, outcome=$4, updated_on=$5' +
+          `WHERE id=$1 AND outcome=0 AND user_id=$6 AND parcour_id=$7`,
+          [ run.id, new Date(run.startedOn), new Date(run.endedOn), run.outcome, new Date(), run.userId, run.parcourId ]
+        )
     ).then(result => {
       if (result.rowCount === 0) throw new Error('0 run affected. Maybe your target was already updated once or one of the parameters is off.');
       return result;
