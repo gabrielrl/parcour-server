@@ -23,6 +23,7 @@ class App {
     
     this.express.use(function finalErrorHandler(err, req, res, next) {
       if (err) {
+        console.error('Unhandled error:', err);
         res.status(err.status || 500).json({
           status: 'error',
           message: err.message,
