@@ -55,20 +55,23 @@ const auth = function(req: Request, res: Response, next: NextFunction) {
  * Middleware that checks for and validates a JSON Web Token to authenticate the request. If proper auth info
  * is found, the request object is augmented with a `User` instance on the `user` property before being handled
  * to the next function. If no auth info is found, the `user` propery is explicitely set to `null` and the next
- * handler is called.
+ * handler is called. If invalid auth info is presented, the request is responded with Unauthorized.
  * @param req Request
  * @param res Response
  * @param next Next function
  */
-
 const checkAuth = function(req: Request, res: Response, next: NextFunction) {
   checkJwt(req, res, function (err?) {
 
     if (err) {
-      // TODO what kind of error are we facing?
-      console.error('auth error=', err);
-      (<AuthenticatedRequest>req).user = null;
-      return next();
+
+      if (err.code === 'credentials_required') {
+        // TODO Are there other error codes we want to let through?
+        (<AuthenticatedRequest>req).user = null;
+        return next();
+      } else {
+        return next(err);
+      }
     }
 
     userRepository
