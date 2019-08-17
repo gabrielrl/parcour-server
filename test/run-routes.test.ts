@@ -372,6 +372,117 @@ describe.only('RunRoutes', () => {
       itInvokesNextWithErrorStatus(400);
     });
 
+    describe('called without a start timestamp', () => {
+      before(() => {
+        stubDependencies();
+        req = mockReq({
+          params: { parcourId },
+          user: { id: userId },
+          body: {
+            id: 'run-id',
+            parcourId,
+            userId,
+            // startedOn: new Date(2010, 5, 6, 12, 0, 0, 0),
+            endedOn: new Date(2010, 5, 6, 12, 12, 12, 0),
+            outcome: RunOutcome.Completed
+          }
+        });
+        routes.update(req, res, next);
+      });
+      
+      itDoesNotInvokeUpdate();
+      itInvokesNextWithErrorStatus(400);
+    });
+
+    describe('called without an end timestamp', () => {
+      before(() => {
+        stubDependencies();
+        req = mockReq({
+          params: { parcourId },
+          user: { id: userId },
+          body: {
+            id: 'run-id',
+            parcourId,
+            userId,
+            startedOn: new Date(2010, 5, 6, 12, 0, 0, 0),
+            // endedOn: new Date(2010, 5, 6, 12, 12, 12, 0),
+            outcome: RunOutcome.Completed
+          }
+        });
+        routes.update(req, res, next);
+      });
+      
+      itDoesNotInvokeUpdate();
+      itInvokesNextWithErrorStatus(400);
+    });
+    describe('called without an outcome', () => {
+      describe('null', () => {
+        before(() => {
+          stubDependencies();
+          req = mockReq({
+            params: { parcourId },
+            user: { id: userId },
+            body: {
+              id: 'run-id',
+              parcourId,
+              userId,
+              startedOn: new Date(2010, 5, 6, 12, 0, 0, 0),
+              endedOn: new Date(2010, 5, 6, 12, 12, 12, 0),
+              outcome: null // RunOutcome.Completed
+            }
+          });
+          routes.update(req, res, next);
+        });
+        
+        itDoesNotInvokeUpdate();
+        itInvokesNextWithErrorStatus(400);
+      });
+
+      describe('RunOutcome.Completed', () => {
+        before(() => {
+          stubDependencies();
+          req = mockReq({
+            params: { parcourId },
+            user: { id: userId },
+            body: {
+              id: 'run-id',
+              parcourId,
+              userId,
+              startedOn: new Date(2010, 5, 6, 12, 0, 0, 0),
+              endedOn: new Date(2010, 5, 6, 12, 12, 12, 0),
+              outcome: RunOutcome.Pending
+            }
+          });
+          routes.update(req, res, next);
+        });
+        
+        itDoesNotInvokeUpdate();
+        itInvokesNextWithErrorStatus(400);
+      });
+    });
+
+    describe('called with a run that ends before it begins', () => {
+      before(() => {
+        stubDependencies();
+        req = mockReq({
+          params: { parcourId },
+          user: { id: userId },
+          body: {
+            id: 'run-id',
+            parcourId,
+            userId,
+            startedOn: new Date(2010, 5, 6, 12, 37, 0, 0),
+            endedOn: new Date(2010, 5, 6, 12, 12, 12, 0),
+            outcome: RunOutcome.Completed
+          }
+        });
+        routes.update(req, res, next);
+      });
+      
+      itDoesNotInvokeUpdate();
+      itInvokesNextWithErrorStatus(400);
+    });
+
     describe('usually (unauthenticated)', () => {
       before(() => {
         stubDependencies();

@@ -117,6 +117,22 @@ export default class RunRoutes {
       return next(new BadRequestError('Authenticated user must match the run user'));
     }
 
+    if (run.startedOn == null) {
+      return next(new BadRequestError('"startedOn" is mandatory'));
+    }
+
+    if (run.endedOn == null) {
+      return next(new BadRequestError('"endedOn" is mandatory'));
+    }
+
+    if (run.outcome == null || run.outcome == RunOutcome.Pending) {
+      return next (new BadRequestError('"outcome" can not be null or "Pending"'));
+    }
+
+    if (run.endedOn < run.startedOn) {
+      return next(new BadRequestError('A run can not ends before it begins'));
+    }
+
     this._runRepository
       .update(run)
       .then(result => {
