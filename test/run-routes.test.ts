@@ -438,7 +438,7 @@ describe.only('RunRoutes', () => {
         itInvokesNextWithErrorStatus(400);
       });
 
-      describe('RunOutcome.Completed', () => {
+      describe('RunOutcome.Pending', () => {
         before(() => {
           stubDependencies();
           req = mockReq({
